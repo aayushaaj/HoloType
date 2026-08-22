@@ -9,7 +9,7 @@ import os
 
 @dataclass
 class HandTrackingConfig:
-    max_hands: int = 1
+    max_hands: int = 2
     detection_confidence: float = 0.7
     tracking_confidence: float = 0.7
     model_complexity: int = 1
@@ -29,12 +29,12 @@ class SmoothingConfig:
 class TapDetectionConfig:
     method: str = "velocity"
     history_len: int = 8
-    down_vel_thresh: float = -0.012
-    up_vel_thresh: float = 0.008
-    pip_margin: float = 0.015
-    refractory: float = 0.12
-    min_press_duration: float = 0.02
-    max_press_duration: float = 0.3
+    down_vel_thresh: float = -0.004
+    up_vel_thresh: float = 0.003
+    pip_margin: float = 0.005
+    refractory: float = 0.08
+    min_press_duration: float = 0.01
+    max_press_duration: float = 0.6
 
 
 @dataclass
@@ -43,6 +43,7 @@ class CalibrationConfig:
     phrase: str = ""
     min_samples_per_key: int = 1
     use_regression: bool = False
+    require_complete_phrase: bool = True
 
 
 @dataclass
@@ -116,10 +117,21 @@ class AppConfig:
                         kwargs[k] = v
             return dc_type(**kwargs)
 
+        tap_detection = dict_to_dc(data.get("tap_detection", {}), TapDetectionConfig)
+        if (
+            tap_detection.down_vel_thresh == -0.012
+            and tap_detection.up_vel_thresh == 0.008
+            and tap_detection.pip_margin == 0.015
+        ):
+            tap_detection = TapDetectionConfig(
+                method=tap_detection.method,
+                history_len=tap_detection.history_len,
+            )
+
         return cls(
             hand_tracking=dict_to_dc(data.get("hand_tracking", {}), HandTrackingConfig),
             smoothing=dict_to_dc(data.get("smoothing", {}), SmoothingConfig),
-            tap_detection=dict_to_dc(data.get("tap_detection", {}), TapDetectionConfig),
+            tap_detection=tap_detection,
             calibration=dict_to_dc(data.get("calibration", {}), CalibrationConfig),
             decoder=dict_to_dc(data.get("decoder", {}), DecoderConfig),
             visual=dict_to_dc(data.get("visual", {}), VisualConfig),

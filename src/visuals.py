@@ -57,6 +57,12 @@ FINGER_COLUMNS = {
 }
 
 
+def _generic_finger_name(finger: str) -> str:
+    if finger.startswith("left_") or finger.startswith("right_"):
+        return finger.split("_", 1)[1]
+    return finger
+
+
 class GlassmorphismRenderer:
     def __init__(self, frame_w: int, frame_h: int):
         self.frame_w = frame_w
@@ -232,7 +238,7 @@ class GlassmorphismRenderer:
             if not fstate.visible:
                 continue
             fx, fy = int(fstate.x * w), int(fstate.y * h)
-            is_owner = fname == target_finger
+            is_owner = _generic_finger_name(fname) == target_finger
             color = fstate.color if is_owner else (120, 120, 130)
 
             self._draw_dashed_line(img, (fx, fy), (tx, ty), color, 12, 8, 2 if is_owner else 1)
@@ -258,7 +264,14 @@ class GlassmorphismRenderer:
     def _draw_skeleton(self, img, landmarks, w: int, h: int):
         if not landmarks:
             return
-        lm = landmarks
+        for hand_landmarks in landmarks:
+            try:
+                lm = list(hand_landmarks.landmark)
+            except Exception:
+                lm = list(hand_landmarks)
+            self._draw_single_skeleton(img, lm, w, h)
+
+    def _draw_single_skeleton(self, img, lm, w: int, h: int):
         connections = [
             (0,1),(1,2),(2,3),(3,4), (0,5),(5,6),(6,7),(7,8),
             (5,9),(9,10),(10,11),(11,12), (9,13),(13,14),(14,15),(15,16),

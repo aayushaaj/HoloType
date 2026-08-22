@@ -53,7 +53,10 @@ class HandTracker:
                 except Exception as e:
                     raise RuntimeError(f"Failed to download MediaPipe model: {e}")
 
-            base_options = mp_python.BaseOptions(model_asset_path=str(model_path))
+            base_options = mp_python.BaseOptions(
+                model_asset_path=str(model_path),
+                delegate=mp_python.BaseOptions.Delegate.CPU,
+            )
             options = mp_vision.HandLandmarkerOptions(
                 base_options=base_options,
                 num_hands=max_hands,

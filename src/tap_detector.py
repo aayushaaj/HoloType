@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
+
 """TapDetector - Z-velocity based tap detection with very sensitive defaults."""
 
 from collections import deque
 from dataclasses import dataclass
-from typing import Optional, Dict
+from typing import Dict, List, Optional
 import numpy as np
 
 

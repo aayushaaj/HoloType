@@ -1,61 +1,119 @@
 # HoloType
 
-Camera-only QWERTY typing — type on an imaginary keyboard in front of your webcam. No physical or on-screen keyboard required.
+Camera-only QWERTY typing: type on an imaginary keyboard in front of your webcam. No physical or on-screen keyboard required.
 
-## Features
+## What Works Now
 
-- **Hand tracking** via MediaPipe Hands (21 landmarks, ~30 FPS)
-- **Multi-finger calibration** — single-finger or full 10-finger touch-typing
-- **Z-velocity tap detection** with adaptive thresholds
-- **Noisy-channel decoder** — spatial confidence + n-gram LM + word frequency
-- **Glassmorphism UI** — iOS-style frosted glass keyboard at 60 FPS
-- **Kalman / One-Euro smoothing** for stable fingertip positions
+- MediaPipe hand tracking for one-hand or two-hand typing
+- Single-finger and touch-typing calibration with handed finger IDs
+- Z-velocity tap detection with smoothing
+- Noisy-channel or spellchecker decoding
+- Guided setup, calibration quality checks, session logs, and benchmark metrics
+- OpenCV keyboard overlay with tap feedback, trails, and optional skeleton debug view
 
 ## Quick Start
 
 ```bash
-# Setup
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
-# Calibrate (first run)
-python -m src.main --calibrate --mode single_finger   # ~1 min, index finger only
-# or
-python -m src.main --calibrate --mode touch_typing    # ~3 min, all 10 fingers
-
-# Type
-python -m src.main --type
+python3 -m src.main setup
+python3 -m src.main calibrate --mode single_finger
+python3 -m src.main type
 ```
+
+After installing the package, the same commands are available through:
+
+```bash
+holo-type setup
+holo-type calibrate --mode single_finger
+holo-type type
+```
+
+## Recommended Workflow
+
+1. Run `setup` to confirm the camera and hand tracking are usable.
+2. Start with `calibrate --mode single_finger`; it is faster and easier to tune.
+3. Type a known phrase with validation enabled:
+
+```bash
+python3 -m src.main type --expected-text "hello world"
+```
+
+4. Check the printed accuracy, CER, WER, and WPM.
+5. Move to `calibrate --mode touch_typing` once single-finger typing feels stable.
+6. Use saved JSONL sessions in `logs/sessions/` to benchmark changes:
+
+```bash
+python3 -m src.main benchmark --session logs/sessions/<session>.jsonl --expected-text "hello world"
+```
+
+## Commands
+
+| Command     | Purpose                                                   |
+| ----------- | --------------------------------------------------------- |
+| `setup`     | Camera and hand-tracking sanity check                     |
+| `calibrate` | Guided calibration; saves only when the profile is usable |
+| `type`      | Live air typing with decoder and session logging          |
+| `benchmark` | Score expected vs actual text or a saved session          |
+
+Legacy flags still work:
+
+```bash
+python3 -m src.main --calibrate --mode single_finger
+python3 -m src.main --type
+```
+
+## Useful Options
+
+```bash
+python3 -m src.main calibrate --mode touch_typing
+python3 -m src.main type --show-skeleton
+python3 -m src.main type --smoothing one_euro
+python3 -m src.main type --decoder spellchecker
+python3 -m src.main type --no-log-session
+python3 -m src.main calibrate --force-save
+```
+
+CLI overrides are temporary by default. Add `--save-config` when you want to persist them to `config.json`.
 
 ## Controls
 
-| Key | Action                              |
-| --- | ----------------------------------- |
-| `q` | Quit                                |
-| `c` | Clear text                          |
-| `r` | Redo current key (calibration only) |
+| Key | Action                                  |
+| --- | --------------------------------------- |
+| `q` | Quit                                    |
+| `c` | Clear typed text                        |
+| `r` | Redo current calibration key            |
+| `s` | Save calibration if quality checks pass |
 
 ## Tap Gesture
 
-Push your index finger **forward/down toward the camera** — a deliberate air-tap motion. The detector looks for:
+Push the active finger forward/down toward the camera with a deliberate tap motion. The detector looks for:
 
-1. Finger tip moving below PIP joint (curled press)
+1. Fingertip moving below the PIP joint
 2. Negative Z velocity spike
 3. Positive Z rebound
 
-## Options
+## Project Layout
 
-```bash
-# Show hand skeleton
-python -m src.main --type --show-skeleton
-
-# Use One-Euro smoothing
-python -m src.main --type --smoothing one_euro
+```text
+src/main.py          CLI and runtime orchestration
+src/runtime.py       Shared factories, finger naming, session logging, metrics
+src/hand_tracker.py  MediaPipe wrapper
+src/calibration.py   Calibration profiles and nearest-key lookup
+src/tap_detector.py  Velocity tap detector
+src/decoder.py       Spellchecker/noisy-channel decoding
+src/smoothing.py     Kalman and One-Euro filters
+src/visuals.py       OpenCV keyboard overlay
 ```
 
 ## Requirements
 
 - Python 3.10+
-- Webcam (720p+ @ 30fps recommended)
-- Good lighting (MediaPipe needs visible hand)
+- Webcam, ideally 720p+ at 30 FPS
+- Good lighting
+
+## TODO
+
+- Improve word typing accuracy: words are not always identified correctly, and the decoding logic may need further tuning.

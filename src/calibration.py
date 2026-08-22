@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """Calibration - Multi-finger touch-typing calibration with centroid computation."""
 
-import json
 import time
-from dataclasses import dataclass
 from collections import defaultdict
+from dataclasses import dataclass
+import json
+import os
 from typing import Dict, List, Optional, Tuple
 import numpy as np
 
@@ -94,6 +95,12 @@ class MultiFingerCalibrator:
         self.current_finger = None
 
     def _init_fingers(self):
+        if self.mode == "single_finger":
+            for finger in ("index", "thumb"):
+                self.finger_calibrations[finger] = FingerCalibration(
+                    finger=finger, hand="single", samples=[]
+                )
+            return
         for finger in FINGER_MAP.keys():
             hand = "left" if finger.startswith("left_") else "right"
             self.finger_calibrations[finger] = FingerCalibration(finger=finger, hand=hand, samples=[])
@@ -102,7 +109,9 @@ class MultiFingerCalibrator:
         if self.current_key_idx >= len(self.phrase):
             return None
         key = self.phrase[self.current_key_idx]
-        if key == " ":
+        if self.mode == "single_finger":
+            finger = "thumb" if key == " " else "index"
+        elif key == " ":
             finger = "left_thumb" if self.current_key_idx % 2 == 0 else "right_thumb"
         else:
             finger = self._find_finger_for_key(key)
@@ -119,7 +128,11 @@ class MultiFingerCalibrator:
     def record_sample(self, key: str, finger: str, x: float, y: float, z: float, confidence: float = 1.0):
         if finger not in self.finger_calibrations:
             return
-        hand = "left" if finger.startswith("left_") else "right"
+        hand = "single"
+        if finger.startswith("left_"):
+            hand = "left"
+        elif finger.startswith("right_"):
+            hand = "right"
         sample = KeySample(key, finger, hand, x, y, z, time.time(), confidence)
         self.finger_calibrations[finger].samples.append(sample)
         self.current_key_idx += 1
@@ -138,44 +151,56 @@ class MultiFingerCalibrator:
     def get_quality_metrics(self) -> Dict:
         metrics = {}
         total_samples = 0
+        key_counts = defaultdict(int)
         for finger, calib in self.finger_calibrations.items():
             n = len(calib.samples)
             unique_keys = len(set(s.key for s in calib.samples))
             avg_conf = np.mean([s.confidence for s in calib.samples]) if n > 0 else 0
             metrics[finger] = {"n_samples": n, "unique_keys": unique_keys, "avg_confidence": avg_conf}
             total_samples += n
+            for sample in calib.samples:
+                key_counts[sample.key] += 1
         metrics["total_samples"] = total_samples
         metrics["completion"] = self.current_key_idx / len(self.phrase) if self.phrase else 1.0
+        metrics["key_counts"] = dict(key_counts)
         return metrics
 
     def save(self, path: str):
+        dir_path = os.path.dirname(path)
+        if dir_path:
+            os.makedirs(dir_path, exist_ok=True)
         centroids = self.build_all_centroids()
         data = {
             "mode": self.mode,
             "phrase": self.phrase,
             "centroids": centroids,
+            "quality": self.get_quality_metrics(),
             "finger_metrics": {f: {"n_samples": len(c.samples)} for f, c in self.finger_calibrations.items()},
             "timestamp": time.time(),
         }
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
 
     @staticmethod
     def load(path: str) -> Dict:
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             return json.load(f)
 
 
 def nearest_key(x: float, y: float, z: float, finger: str, centroids: Dict, use_hand: bool = True) -> Tuple[str, float, float]:
     plausible = []
-    finger_hand = "left" if finger.startswith("left_") else "right"
+    finger_hand = None
+    if finger.startswith("left_"):
+        finger_hand = "left"
+    elif finger.startswith("right_"):
+        finger_hand = "right"
 
     for key, c in centroids.items():
         c_finger = c.get("finger", "")
         c_hand = c.get("hand", "")
         if finger != c_finger:
             continue
-        if use_hand and c_hand != finger_hand and key != " ":
+        if use_hand and finger_hand and c_hand != finger_hand and key != " ":
             continue
         plausible.append((key, c))
 

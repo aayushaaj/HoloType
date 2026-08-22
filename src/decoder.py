@@ -75,12 +75,22 @@ class NGramLanguageModel:
 
 
 class NoisyChannelDecoder:
-    def __init__(self, vocabulary_path: str = None):
+    def __init__(
+        self,
+        vocabulary_path: str = None,
+        ngram_order: int = 3,
+        emission_weight: float = 1.0,
+        lm_weight: float = 0.5,
+        freq_weight: float = 0.3,
+    ):
         self.buffer: List[KeyObservation] = []
         self.decoded_text = ""
         self.spatial_model = SpatialConfidenceModel()
-        self.lm = NGramLanguageModel(n=3)
+        self.lm = NGramLanguageModel(n=ngram_order)
         self.word_freq = Counter()
+        self.emission_weight = emission_weight
+        self.lm_weight = lm_weight
+        self.freq_weight = freq_weight
 
         if vocabulary_path and os.path.exists(vocabulary_path):
             with open(vocabulary_path) as f:
@@ -173,7 +183,12 @@ class NoisyChannelDecoder:
         lm_logp = self.lm.logprob(word)
         freq_logp = np.log(self.word_freq.get(word, 1) + 1)
 
-        return 1.0 * emission_logp + 0.5 * lm_logp + 0.3 * freq_logp + length_penalty
+        return (
+            self.emission_weight * emission_logp
+            + self.lm_weight * lm_logp
+            + self.freq_weight * freq_logp
+            + length_penalty
+        )
 
     def _edit_distance(self, s1: str, s2: str) -> int:
         if len(s1) < len(s2):
