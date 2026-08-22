@@ -38,5 +38,6 @@ config.json
 # Model files (large, downloaded on demand)
 data/models/*.task
 
-# Documentation
-*.md
+# Documentation (keep README.md)
+Context.md
+PROJECT_DOCUMENTATION.md
