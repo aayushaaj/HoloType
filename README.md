@@ -1,4 +1,4 @@
-# Air Typer
+# HoloType
 
 Camera-only QWERTY typing — type on an imaginary keyboard in front of your webcam. No physical or on-screen keyboard required.
 

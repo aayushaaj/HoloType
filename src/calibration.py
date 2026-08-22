@@ -1,4 +1,5 @@
-"""Calibration — Multi-finger touch-typing calibration with centroid computation."""
+# -*- coding: utf-8 -*-
+"""Calibration - Multi-finger touch-typing calibration with centroid computation."""
 
 import json
 import time

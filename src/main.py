@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 """
-main.py — Air Typer: Camera-only QWERTY typing with premium glassmorphism UI.
+main.py - HoloType: Camera-only QWERTY typing with premium glassmorphism UI.
 
 Pipeline: Webcam -> HandTracker -> Smoothing -> TapDetector -> Calibration -> Decoder -> GlassmorphismRenderer
 
@@ -376,7 +377,7 @@ def run_benchmark(config: AppConfig):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Air Typer - Camera-only QWERTY typing with glassmorphism UI",
+        description="HoloType - Camera-only QWERTY typing with glassmorphism UI",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

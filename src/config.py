@@ -1,4 +1,5 @@
-"""Config — Centralized configuration with validation and persistence."""
+# -*- coding: utf-8 -*-
+"""Config - Centralized configuration with validation and persistence."""
 
 from dataclasses import dataclass, field, fields
 from typing import Any

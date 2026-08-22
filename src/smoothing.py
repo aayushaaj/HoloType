@@ -1,6 +1,5 @@
-"""
-src/smoothing.py — Kalman filter and One-Euro filter for fingertip smoothing.
-"""
+# -*- coding: utf-8 -*-
+"""Kalman filter and One-Euro filter for fingertip smoothing."""
 
 import numpy as np
 from dataclasses import dataclass, field
@@ -10,19 +9,13 @@ from collections import defaultdict
 
 @dataclass
 class KalmanState:
-    x: np.ndarray  # 6x1 state vector [x, y, z, vx, vy, vz]
-    P: np.ndarray  # 6x6 covariance
+    x: np.ndarray
+    P: np.ndarray
     initialized: bool = False
     last_timestamp: float = 0.0
 
 
 class FingertipKalmanFilter:
-    """
-    3D constant-velocity Kalman filter per fingertip.
-    State: [x, y, z, vx, vy, vz]
-    Measurement: [x, y, z] from MediaPipe
-    """
-
     def __init__(
         self,
         process_noise: float = 1e-4,
@@ -34,26 +27,22 @@ class FingertipKalmanFilter:
         self.measurement_noise = measurement_noise
         self.filters: Dict[str, KalmanState] = defaultdict(lambda: None)
 
-        # State transition matrix (constant velocity)
         self.F = np.eye(6)
         self.F[0, 3] = dt
         self.F[1, 4] = dt
         self.F[2, 5] = dt
 
-        # Measurement matrix (observe position only)
         self.H = np.zeros((3, 6))
         self.H[0, 0] = 1
         self.H[1, 1] = 1
         self.H[2, 2] = 1
 
-        # Process noise covariance
         self.Q = np.eye(6) * process_noise
         self.Q[0, 0] = self.Q[1, 1] = self.Q[2, 2] = process_noise * dt**2 / 3
         self.Q[3, 3] = self.Q[4, 4] = self.Q[5, 5] = process_noise
 
-        # Measurement noise covariance
         self.R = np.eye(3) * measurement_noise
-        self.R[2, 2] = measurement_noise * 10  # Z is noisier
+        self.R[2, 2] = measurement_noise * 10
 
     def update(self, finger: str, x: float, y: float, z: float, timestamp: float) -> tuple:
         state = self.filters[finger]
@@ -76,11 +65,9 @@ class FingertipKalmanFilter:
         F = self.F.copy()
         F[0, 3] = F[1, 4] = F[2, 5] = dt
 
-        # PREDICT
         x_pred = F @ state.x
         P_pred = F @ state.P @ F.T + self.Q
 
-        # UPDATE
         z_meas = np.array([[x], [y], [z]], dtype=float)
         y_residual = z_meas - self.H @ x_pred
         S = self.H @ P_pred @ self.H.T + self.R
@@ -103,8 +90,6 @@ class FingertipKalmanFilter:
 
 
 class OneEuroFilter:
-    """One Euro Filter (Casiez et al.) for 1D adaptive smoothing."""
-
     def __init__(self, min_cutoff=1.0, beta=0.0, d_cutoff=1.0):
         self.min_cutoff = min_cutoff
         self.beta = beta
@@ -140,8 +125,6 @@ class OneEuroFilter:
 
 
 class MultiAxisOneEuroFilter:
-    """One Euro filter for 3D positions (x, y, z independent)."""
-
     def __init__(self, **kwargs):
         self.filters = {}
         self.kwargs = kwargs

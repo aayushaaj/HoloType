@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "air-typer"
+name = "holo-type"
 version = "0.2.0"
 description = "Camera-only QWERTY typing with glassmorphism UI"
 readme = "README.md"
@@ -21,7 +21,7 @@ optional-dependencies = {
 }
 
 [project.scripts]
-air-typer = "src.main:main"
+holo-type = "src.main:main"
 
 [tool.ruff]
 line-length = 100

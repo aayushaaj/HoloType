@@ -1,4 +1,5 @@
-"""HandTracker — MediaPipe Hands wrapper returning normalized fingertip positions."""
+# -*- coding: utf-8 -*-
+"""HandTracker - MediaPipe Hands wrapper returning normalized fingertip positions."""
 
 from dataclasses import dataclass, field
 import time

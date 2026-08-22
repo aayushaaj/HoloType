@@ -1,4 +1,5 @@
-"""TapDetector — Z-velocity based tap detection with very sensitive defaults."""
+# -*- coding: utf-8 -*-
+"""TapDetector - Z-velocity based tap detection with very sensitive defaults."""
 
 from collections import deque
 from dataclasses import dataclass
@@ -21,12 +22,12 @@ class VelocityTapDetector:
     def __init__(
         self,
         history_len: int = 8,
-        down_vel_thresh: float = -0.004,   # Very sensitive
-        up_vel_thresh: float = 0.003,      # Very sensitive
-        pip_margin: float = 0.005,         # Very sensitive
-        refractory: float = 0.08,          # Fast repeat
-        min_press_duration: float = 0.01,  # Very short min
-        max_press_duration: float = 0.6,   # Long max
+        down_vel_thresh: float = -0.004,
+        up_vel_thresh: float = 0.003,
+        pip_margin: float = 0.005,
+        refractory: float = 0.08,
+        min_press_duration: float = 0.01,
+        max_press_duration: float = 0.6,
         debug: bool = False,
     ):
         self.history_len = history_len

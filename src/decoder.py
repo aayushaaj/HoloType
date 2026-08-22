@@ -1,4 +1,5 @@
-"""Decoder — Noisy-channel decoder with spatial confidence integration."""
+# -*- coding: utf-8 -*-
+"""Decoder - Noisy-channel decoder with spatial confidence integration."""
 
 from collections import Counter, defaultdict
 from dataclasses import dataclass
