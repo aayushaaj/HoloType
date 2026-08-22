@@ -30,46 +30,23 @@ python -m src.main --type
 
 ## Controls
 
-| Key | Action |
-|-----|--------|
-| `q` | Quit |
-| `c` | Clear text |
+| Key | Action                              |
+| --- | ----------------------------------- |
+| `q` | Quit                                |
+| `c` | Clear text                          |
 | `r` | Redo current key (calibration only) |
 
 ## Tap Gesture
 
 Push your index finger **forward/down toward the camera** — a deliberate air-tap motion. The detector looks for:
+
 1. Finger tip moving below PIP joint (curled press)
 2. Negative Z velocity spike
 3. Positive Z rebound
 
-## Project Structure
-
-```
-air-typer/
-├── src/
-│   ├── hand_tracker.py    # MediaPipe Hands wrapper
-│   ├── smoothing.py       # Kalman & One-Euro filters
-│   ├── tap_detector.py    # Z-velocity tap detection
-│   ├── calibration.py     # Multi-finger calibration
-│   ├── decoder.py         # Noisy-channel + spellchecker
-│   ├── visuals.py         # Glassmorphism renderer
-│   ├── config.py          # Typed configuration
-│   └── main.py            # CLI orchestration
-├── data/
-│   ├── calibration_profile.json
-│   └── models/            # MediaPipe model (downloaded on demand)
-├── .gitignore
-├── pyproject.toml
-└── requirements.txt
-```
-
 ## Options
 
 ```bash
-# Debug tap detection
-python -m src.main --type --debug-tap
-
 # Show hand skeleton
 python -m src.main --type --show-skeleton
 
@@ -82,7 +59,3 @@ python -m src.main --type --smoothing one_euro
 - Python 3.10+
 - Webcam (720p+ @ 30fps recommended)
 - Good lighting (MediaPipe needs visible hand)
-
-## License
-
-MIT
