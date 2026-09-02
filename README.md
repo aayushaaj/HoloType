@@ -51,28 +51,6 @@ python3 -m src.main type --expected-text "hello world"
 | `benchmark` | Score expected vs actual text or a saved session          |
 
 
-## Useful Options
-
-```bash
-python3 -m src.main calibrate --mode touch_typing
-python3 -m src.main type --show-skeleton
-python3 -m src.main type --smoothing one_euro
-python3 -m src.main type --decoder spellchecker
-python3 -m src.main type --no-log-session
-python3 -m src.main calibrate --force-save
-```
-
-CLI overrides are temporary by default. Add `--save-config` when you want to persist them to `config.json`.
-
-## Controls
-
-| Key | Action                                  |
-| --- | --------------------------------------- |
-| `q` | Quit                                    |
-| `c` | Clear typed text                        |
-| `r` | Redo current calibration key            |
-| `s` | Save calibration if quality checks pass |
-
 ## Tap Gesture
 
 Push the active finger forward/down toward the camera with a deliberate tap motion. The detector looks for:
