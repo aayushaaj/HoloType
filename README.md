@@ -93,19 +93,6 @@ Push the active finger forward/down toward the camera with a deliberate tap moti
 2. Negative Z velocity spike
 3. Positive Z rebound
 
-## Project Layout
-
-```text
-src/main.py          CLI and runtime orchestration
-src/runtime.py       Shared factories, finger naming, session logging, metrics
-src/hand_tracker.py  MediaPipe wrapper
-src/calibration.py   Calibration profiles and nearest-key lookup
-src/tap_detector.py  Velocity tap detector
-src/decoder.py       Spellchecker/noisy-channel decoding
-src/smoothing.py     Kalman and One-Euro filters
-src/visuals.py       OpenCV keyboard overlay
-```
-
 ## Requirements
 
 - Python 3.10+
