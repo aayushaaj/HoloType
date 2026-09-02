@@ -2,9 +2,7 @@
 
 Camera-only QWERTY typing: type on an imaginary keyboard in front of your webcam. No physical or on-screen keyboard required.
 
-## What Works Now
-
-- MediaPipe hand tracking for one-hand or two-hand typing
+- MediaPipe hand tracking for one-hand
 - Single-finger and touch-typing calibration with handed finger IDs
 - Z-velocity tap detection with smoothing
 - Noisy-channel or spellchecker decoding
