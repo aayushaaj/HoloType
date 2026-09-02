@@ -50,12 +50,6 @@ python3 -m src.main type --expected-text "hello world"
 | `type`      | Live air typing with decoder and session logging          |
 | `benchmark` | Score expected vs actual text or a saved session          |
 
-Legacy flags still work:
-
-```bash
-python3 -m src.main --calibrate --mode single_finger
-python3 -m src.main --type
-```
 
 ## Useful Options
 
