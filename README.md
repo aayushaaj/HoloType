@@ -38,14 +38,8 @@ holo-type type
 ```bash
 python3 -m src.main type --expected-text "hello world"
 ```
-
 4. Check the printed accuracy, CER, WER, and WPM.
-5. Move to `calibrate --mode touch_typing` once single-finger typing feels stable.
-6. Use saved JSONL sessions in `logs/sessions/` to benchmark changes:
 
-```bash
-python3 -m src.main benchmark --session logs/sessions/<session>.jsonl --expected-text "hello world"
-```
 
 ## Commands
 
